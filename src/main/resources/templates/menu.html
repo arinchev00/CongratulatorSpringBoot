@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Меню</title>
+</head>
+<body>
+<h1>Меню</h1>
+
+<!-- Список пользователей с ближайшими днями рождения -->
+<div th:if="${not #maps.isEmpty(upcomingBirthdays)}">
+    <h2>Пользователи с ближайшими днями рождения:</h2>
+    <table border="1">
+        <tr>
+            <th>Имя пользователя</th>
+            <th>Дней до дня рождения</th>
+        </tr>
+        <!-- Проходим по каждому элементу карты и выводим имена пользователей -->
+        <tr th:each="entry : ${upcomingBirthdays}">
+            <td th:each="name : ${entry.value}" th:text="${name}"></td>
+            <td th:text="${entry.key > 0 ? 'Через ' + entry.key + ' дней' : 'Прошло ' + (-entry.key) + ' дней'}"></td>
+        </tr>
+    </table>
+</div>
+
+<!-- Основное меню -->
+<h2>Главное меню</h2>
+<ul>
+    <li><a href="/solarlab/api/menu/all">Показать всех пользователей</a></li>
+    <li><a href="/solarlab/api/menu/create">Добавить нового пользователя</a></li>
+    <li><a href="/solarlab/api/menu/edit">Редактировать пользователя</a></li>
+    <li><a href="/solarlab/api/menu/delete">Удалить пользователя</a></li>
+    <li><a href="/solarlab/api/menu/exit">Закрыть приложение</a></li>
+</ul>
+</body>
+</html>

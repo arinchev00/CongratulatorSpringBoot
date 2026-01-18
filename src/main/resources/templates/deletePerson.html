@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Удаление пользователя</title>
+</head>
+<body>
+<h1>Удаление пользователя:</h1>
+<form method="post" action="/solarlab/api/menu/delete">
+    <input type="hidden" name="id" th:value="${person.id}">
+    <p>Вы уверены, что хотите удалить пользователя <span th:text="${person.fullName}"></span>?</p>
+    <button type="submit">Удалить</button>
+</form>
+<a href="/solarlab/api/menu">Вернуться в меню</a>
+</body>
+</html>
