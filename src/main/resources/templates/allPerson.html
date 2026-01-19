@@ -1,16 +1,194 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <meta charset="UTF-8">
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"/>
     <title>Все пользователи</title>
+    <style>
+        /* Перемещение кнопки вниз */
+        .button-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        /* Скрытая форма редактирования */
+        #editFormContainer {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        /* Стили для кнопок в ячейке */
+        .action-buttons .btn {
+            margin-right: 5px;
+        }
+    </style>
 </head>
+
 <body>
-<h1>Все пользователи:</h1>
-<ul>
-    <li th:each="person : ${people}">
-        <span th:text="${person.fullName}"></span> (<span th:text="${person.birthDate}"></span>)
-    </li>
-</ul>
-<a href="/solarlab/api/menu">Вернуться в меню</a>
+
+<div class="container">
+    <div class="row py-2">
+        <div class="col-12">
+            <h1>Все пользователи:</h1>
+        </div>
+
+        <div class="col-12">
+            <table class="table table-bordered my-2" id="usersTable">
+                <thead>
+                <tr>
+                    <th scope="col">Имя и Фамилия пользователя</th>
+                    <th scope="col">Дата дня рождения</th>
+                    <th scope="col">Действия</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${people.empty}">
+                    <td class="text-center" colspan="3">No data</td>
+                </tr>
+                <tr th:each="person : ${people}"
+                    th:attr="data-id=${person.id}, data-fullname=${person.fullName}, data-birthdate=${person.birthDate}">
+                    <td th:text="${person.fullName}"></td>
+                    <td th:text="${person.birthDate}"></td>
+                    <td class="action-buttons">
+                        <a class="btn btn-sm btn-primary" href="javascript:void(0);"
+                           onclick="showEditForm(this)"><i class="fas fa-edit"></i></a>
+                        <a class="btn btn-sm btn-danger" href="javascript:void(0);"
+                           onclick="deletePerson(this)">
+                            <i class="far fa-trash-alt"></i>
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Форма редактирования (скрыта по умолчанию) -->
+        <div id="editFormContainer">
+            <h4>Редактирование пользователя</h4>
+            <form id="editForm" th:action="@{/solarlab/api/menu/edit}" method="post">
+                <input type="hidden" id="editId" name="id"/>
+
+                <div class="form-group">
+                    <label for="editFullName">Имя и фамилия</label>
+                    <input type="text" class="form-control" id="editFullName" name="fullName" required/>
+                </div>
+
+                <div class="form-group">
+                    <label for="editBirthDate">Дата рождения</label>
+                    <input type="text" class="form-control" id="editBirthDate" name="birthDate" placeholder="ГГГГ-ММ-ДД" required/>
+                </div>
+
+                <button type="submit" class="btn btn-success">Сохранить изменения</button>
+                <button type="button" class="btn btn-secondary" onclick="hideEditForm()">Отменить</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="button-container">
+    <a href="/solarlab/api/menu" class="btn btn-primary">Вернуться в меню</a>
+</div>
+
+<!-- Optional JavaScript -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+
+<!-- Подключение IMask.js для маски даты -->
+<script src="https://unpkg.com/imask"></script>
+
+<script>
+    // Функция для отображения формы редактирования
+    function showEditForm(button) {
+        const row = button.closest('tr');
+        const id = row.getAttribute('data-id');
+        const fullName = row.getAttribute('data-fullname');
+        const birthDate = row.getAttribute('data-birthdate');
+
+        document.getElementById('editId').value = id;
+        document.getElementById('editFullName').value = fullName;
+        document.getElementById('editBirthDate').value = birthDate;
+
+        document.getElementById('editFormContainer').style.display = 'block';
+
+        const birthDateInput = document.getElementById('editBirthDate');
+        const dateMask = IMask(birthDateInput, {
+            mask: '0000-00-00',
+            lazy: false,
+            placeholderChar: '0'
+        });
+    }
+
+    // Функция для скрытия формы редактирования
+    function hideEditForm() {
+        document.getElementById('editFormContainer').style.display = 'none';
+    }
+
+    // Функция для удаления
+    function deletePerson(button) {
+        let row = button.closest('tr');
+        let personId = row.getAttribute('data-id');
+
+        if (!personId || isNaN(parseInt(personId))) {
+            alert('Не удалось получить ID пользователя.');
+            return;
+        }
+
+        fetch(`/solarlab/api/menu/delete/${personId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(response => {
+            if (response.ok) {
+                row.remove();
+                alert('Пользователь успешно удалён!');
+            } else {
+                alert('Ошибка при удалении пользователя.');
+            }
+        }).catch(error => {
+            console.error('Ошибка:', error);
+            alert('Произошла ошибка сети.');
+        });
+    }
+
+    // Отправка формы редактирования через AJAX
+    document.getElementById('editForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // Предотвращаем стандартную отправку формы
+
+        const formData = new FormData(document.getElementById('editForm'));
+
+        fetch('/solarlab/api/menu/edit', {
+            method: 'POST',
+            body: formData
+        }).then(response => {
+            if (response.ok) {
+                alert('Изменения сохранены!');
+                location.reload(); // Обновляем страницу для отображения изменений
+            } else {
+                alert('Ошибка при сохранении изменений.');
+            }
+        }).catch(error => {
+            console.error('Ошибка:', error);
+            alert('Произошла ошибка сети.');
+        });
+    });
+</script>
 </body>
 </html>

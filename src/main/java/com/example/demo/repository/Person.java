@@ -1,7 +1,6 @@
 package com.example.demo.repository;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -61,6 +60,16 @@ public class Person {
                 ", fullName='" + fullName + '\'' +
                 ", birthDate=" + birthDate +
                 '}';
+    }
+
+    private String birthdayStatus;
+
+    public String getBirthdayStatus() {
+        return birthdayStatus;
+    }
+
+    public void setBirthdayStatus(String birthdayStatus) {
+        this.birthdayStatus = birthdayStatus;
     }
 }
 

@@ -5,6 +5,8 @@ import com.example.demo.repository.PersonRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,7 +20,9 @@ public class PersonService {
     }
 
     public List<Person> findAll() {
-        return personRepository.findAll();
+        List<Person> people = personRepository.findAll();
+        Collections.sort(people, Comparator.comparing(Person::getFullName));
+        return people;
     }
 
     public Person create(Person person) {

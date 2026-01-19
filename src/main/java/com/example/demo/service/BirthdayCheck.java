@@ -18,27 +18,59 @@ public class BirthdayCheck {
         this.personService = personService;
     }
 
-    public Map<Integer, List<String>> findUpcomingBirthdays() {
+    public List<Person> findUpcomingBirthdays() {
         List<Person> users = personService.findAll();
         LocalDate today = LocalDate.now();
-
-        Map<Integer, List<String>> resultMap = new TreeMap<>();
+        List<Person> filteredUsers = new ArrayList<>();
 
         for (Person user : users) {
             LocalDate birthday = user.getBirthDate();
             LocalDate thisYearBirthday = birthday.withYear(today.getYear());
+            long daysUntilBirthday;
 
-            int daysDifference = Math.toIntExact(ChronoUnit.DAYS.between(today, thisYearBirthday));
-
-            if (resultMap.containsKey(daysDifference)) {
-                resultMap.get(daysDifference).add(user.getFullName());
+            if (!thisYearBirthday.isBefore(today)) {
+                daysUntilBirthday = ChronoUnit.DAYS.between(today, thisYearBirthday);
             } else {
-                List<String> list = new ArrayList<>();
-                list.add(user.getFullName());
-                resultMap.put(daysDifference, list);
+                daysUntilBirthday = ChronoUnit.DAYS.between(thisYearBirthday, today) * -1;
             }
+
+            String status;
+            switch ((int) daysUntilBirthday) {
+                case 0: status = "Сегодня"; break;
+                case 1: status = "Завтра"; break;
+                case 2: status = "Послезавтра"; break;
+                case -1: status = "Вчера"; break;
+                case -2: status = "Позавчера"; break;
+                default: continue; // Пропускаем остальные случаи
+            }
+            user.setBirthdayStatus(status);
+            filteredUsers.add(user);
         }
 
-        return resultMap;
+        // Сортируем сначала по статусу, потом по имени
+        Collections.sort(filteredUsers, new Comparator<Person>() {
+            @Override
+            public int compare(Person p1, Person p2) {
+                // Порядок сортировки статусов
+                String[] statuses = {"Сегодня", "Завтра", "Послезавтра", "Вчера", "Позавчера"};
+                int index1 = getStatusIndex(p1.getBirthdayStatus(), statuses);
+                int index2 = getStatusIndex(p2.getBirthdayStatus(), statuses);
+                if (index1 != index2) {
+                    return index1 - index2;
+                }
+                return p1.getFullName().compareTo(p2.getFullName());
+            }
+
+            private int getStatusIndex(String status, String[] statuses) {
+                for (int i = 0; i < statuses.length; i++) {
+                    if (statuses[i].equals(status)) {
+                        return i;
+                    }
+                }
+                return Integer.MAX_VALUE; // Если статус не найден
+            }
+        });
+
+        return filteredUsers;
     }
 }

@@ -1,36 +1,86 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="en">
-<head>
-    <meta charset="UTF-8"/>
-    <title>Меню</title>
-</head>
-<body>
-<h1>Меню</h1>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
-<!-- Список пользователей с ближайшими днями рождения -->
-<div th:if="${not #maps.isEmpty(upcomingBirthdays)}">
-    <h2>Пользователи с ближайшими днями рождения:</h2>
-    <table border="1">
-        <tr>
-            <th>Имя пользователя</th>
-            <th>Дней до дня рождения</th>
-        </tr>
-        <!-- Проходим по каждому элементу карты и выводим имена пользователей -->
-        <tr th:each="entry : ${upcomingBirthdays}">
-            <td th:each="name : ${entry.value}" th:text="${name}"></td>
-            <td th:text="${entry.key > 0 ? 'Через ' + entry.key + ' дней' : 'Прошло ' + (-entry.key) + ' дней'}"></td>
-        </tr>
-    </table>
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"/>
+    <title>Поздравлятор</title>
+    <style>
+        /* Выравнивание текста и таблицы по левому краю */
+        .container {
+            text-align: left; /* Выравнивание по левому краю */
+        }
+
+        /* Выравнивание заголовка и текста под ним по левому краю */
+        h1, h3 {
+            text-align: left; /* Выравнивание по левому краю */
+        }
+
+        /* Выравнивание текстового меню по центру */
+        .text-menu {
+            text-align: center; /* Выравнивание по центру */
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <div class="row py-2">
+        <div class="col-12">
+            <h1>Поздравлятор</h1>
+        </div>
+
+        <div class="col-12">
+            <h3>Данное приложение предназначено для ведения списка друзей/знакомых/сотрудников, у которых в ближайшее время было или будет День Рождения</h3>
+        </div>
+
+        <div class="col-12">
+            <table class="table table-bordered my-2">
+                <thead>
+                <tr>
+                    <th scope="col">Имя и Фамилия пользователя</th>
+                    <th scope="col">Когда было/будет день рождения?</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(upcomingBirthdays)}">
+                    <td class="text-center" colspan="2">Нет данных</td>
+                </tr>
+                <tr th:each="person : ${upcomingBirthdays}">
+                    <td th:text="${person.fullName}"></td>
+                    <td th:text="${person.birthdayStatus}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
-<!-- Основное меню -->
-<h2>Главное меню</h2>
-<ul>
-    <li><a href="/solarlab/api/menu/all">Показать всех пользователей</a></li>
-    <li><a href="/solarlab/api/menu/create">Добавить нового пользователя</a></li>
-    <li><a href="/solarlab/api/menu/edit">Редактировать пользователя</a></li>
-    <li><a href="/solarlab/api/menu/delete">Удалить пользователя</a></li>
-    <li><a href="/solarlab/api/menu/exit">Закрыть приложение</a></li>
-</ul>
+<div class="text-menu">
+    <h2>Текстовое меню</h2>
+    <ul>
+        <li><a href="/solarlab/api/menu/all">Показать весь список пользователей, добавленных в приложение</a></li>
+        <li><a href="/solarlab/api/menu/create">Добавить нового пользователя</a></li>
+    </ul>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
 </body>
 </html>
