@@ -49,6 +49,7 @@
                 <tr>
                     <th scope="col">Имя и Фамилия пользователя</th>
                     <th scope="col">Когда было/будет день рождения?</th>
+                    <th scope="col">Фотография</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -58,6 +59,9 @@
                 <tr th:each="person : ${upcomingBirthdays}">
                     <td th:text="${person.fullName}"></td>
                     <td th:text="${person.birthdayStatus}"></td>
+                    <td>
+                        <img th:src="@{'/images/' + ${person.images.get(0)}}"/>
+                    </td>
                 </tr>
                 </tbody>
             </table>

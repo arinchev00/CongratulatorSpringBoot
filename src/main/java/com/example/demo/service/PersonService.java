@@ -1,9 +1,12 @@
 package com.example.demo.service;
 
+import com.example.demo.repository.Image;
 import com.example.demo.repository.Person;
 import com.example.demo.repository.PersonRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.Comparator;
@@ -25,9 +28,24 @@ public class PersonService {
         return people;
     }
 
-    public Person create(Person person) {
+    public Person create(Person person, MultipartFile file) throws IOException {
+        Image image;
+        if (file.getSize() != 0){
+            image = toImageEntity(file);
+            person.addImageToPerson(image);
+        }
         return personRepository.save(person);
     }
+
+        private Image toImageEntity(MultipartFile file) throws IOException {
+            Image image = new Image();
+            image.setName(file.getName());
+            image.setOriginalFileName(file.getOriginalFilename());
+            image.setContentType(file.getContentType());
+            image.setSize(file.getSize());
+            image.setBytes(file.getBytes());
+            return image;
+        }
 
     public void delete(Long id) {
         personRepository.deleteById(id);

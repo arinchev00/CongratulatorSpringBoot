@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "person")
@@ -19,6 +21,9 @@ public class Person {
 
     @Column(name = "birth_date")
     private LocalDate birthDate;
+
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "person")
+    private List<Image> images = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -70,6 +75,11 @@ public class Person {
 
     public void setBirthdayStatus(String birthdayStatus) {
         this.birthdayStatus = birthdayStatus;
+    }
+
+    public void addImageToPerson (Image image) {
+        image.setPerson(this);
+        images.add(image);
     }
 }
 
