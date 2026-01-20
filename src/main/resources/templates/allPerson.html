@@ -104,6 +104,7 @@
         crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/imask/6.4.3/imask.min.js"></script>
 
+
 <script>
     let photoToRemove = false;
 
@@ -117,7 +118,6 @@
         const hasPhoto = row.getAttribute('data-has-photo') === 'true';
         const photoId = row.getAttribute('data-photo-id');
 
-
         // Заполняем поля формы
         document.getElementById('editId').value = id;
         document.getElementById('editFullName').value = fullName;
@@ -128,6 +128,7 @@
         // Отображение текущего фото
         const currentPhotoDiv = document.getElementById('currentPhoto');
         const currentPhotoImg = document.getElementById('currentPhotoImg');
+
 
         if (hasPhoto && photoId) {
             currentPhotoImg.src = `/images/${photoId}`;
@@ -147,33 +148,70 @@
     }
 
     document.getElementById('editForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-    const formData = new FormData(this);
+        event.preventDefault();
+        const formData = new FormData(this);
 
-    if (photoToRemove) {
-        formData.append('removePhoto', 'true');
-        console.log('Флаг удаления передан: removePhoto=true');
-    } else {
-        console.log('Флаг удаления не установлен');
-    }
-
-    fetch('/solarlab/api/menu/edit', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => {
-        if (response.ok) {
-            alert('Изменения сохранены!');
-            location.reload();
+        if (photoToRemove) {
+            formData.append('removePhoto', 'true');
+            console.log('Флаг удаления передан: removePhoto=true');
         } else {
-            alert('Ошибка при сохранении.');
+            console.log('Флаг удаления не установлен');
         }
-    })
-    .catch(error => {
-        console.error('Ошибка:', error);
-        alert('Ошибка сети.');
+
+        fetch('/solarlab/api/menu/edit', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('Изменения сохранены!');
+                location.reload();
+            } else {
+                alert('Ошибка при сохранении.');
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+            alert('Ошибка сети.');
+        });
     });
-});
+
+    // Функция для удаления пользователя
+    function deletePerson(button) {
+        let row = button.closest('tr');
+        let personId = row.getAttribute('data-id');
+
+        if (!personId || isNaN(parseInt(personId))) {
+            alert('Не удалось получить ID пользователя.');
+            return;
+        }
+
+        // Показываем диалоговое окно подтверждения
+        if (!confirm('Вы уверены, что хотите удалить этого пользователя?')) {
+            return;
+        }
+
+        fetch(`/solarlab/api/menu/delete/${personId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                row.remove(); // Удаляем строку из таблицы
+                alert('Пользователь успешно удалён!');
+            } else {
+                return response.json().then(data => {
+                    alert(`Ошибка: ${data.message || 'Не удалось удалить пользователя'}`);
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка сети при удалении:', error);
+            alert('Произошла ошибка сети. Не удалось удалить пользователя.');
+        });
+    }
 </script>
 </body>
 </html>

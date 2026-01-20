@@ -1,7 +1,6 @@
 package com.example.demo.controller;
 
 import com.example.demo.repository.Person;
-import com.example.demo.service.BirthdayCheck;
 import com.example.demo.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,7 +14,6 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Controller
 public class PersonController {
@@ -52,7 +50,7 @@ public class PersonController {
         person.setBirthDate(birthDate);
 
         try {
-            personService.create(person, file); // сохранение с изображением
+            personService.create(person, file);
         } catch (IOException e) {
             model.addAttribute("error", "Ошибка при загрузке файла: " + e.getMessage());
             return "menu/create";
