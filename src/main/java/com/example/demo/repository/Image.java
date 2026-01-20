@@ -17,12 +17,10 @@ public class Image {
 
     private String name;
 
-    @Column(name = "name")
     private String originalFileName;
 
     private Long size;
 
-    @Column(name = "name")
     private String contentType;
 
     @Lob

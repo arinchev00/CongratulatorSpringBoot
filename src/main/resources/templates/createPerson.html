@@ -32,7 +32,7 @@
         </div>
 
         <div class="col-12">
-            <form method="post" action="/solarlab/api/menu/create">
+            <form method="post" action="/solarlab/api/menu/create" enctype="multipart/form-data">
                 <div class="form-group">
                     <label for="fullName">Имя и фамилия:</label>
                     <input type="text" class="form-control" id="fullName" name="fullName" required>
@@ -41,7 +41,7 @@
                     <label for="birthDate">Дата рождения:</label>
                     <input type="date" class="form-control" id="birthDate" name="birthDate" required>
                 </div>
-                Фотография: <input type="file" name="file">/><br><br>
+                Фотография: <input type="file" name="file"><br><br>
                 <button type="submit" class="btn btn-create">Добавить</button>
             </form>
         </div>

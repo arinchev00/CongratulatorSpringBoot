@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.repository.Image;
+import com.example.demo.repository.ImagesRepository;
 import com.example.demo.repository.Person;
 import com.example.demo.repository.PersonRepository;
 import org.springframework.stereotype.Service;
@@ -17,9 +18,12 @@ import java.util.Optional;
 public class PersonService {
 
     private final PersonRepository personRepository;
+    private final ImagesRepository imagesRepository; // Добавляем поле
 
-    public PersonService(PersonRepository personRepository) {
+    // Конструктор с внедрением зависимостей
+    public PersonService(PersonRepository personRepository, ImagesRepository imagesRepository) {
         this.personRepository = personRepository;
+        this.imagesRepository = imagesRepository;
     }
 
     public List<Person> findAll() {
@@ -29,39 +33,59 @@ public class PersonService {
     }
 
     public Person create(Person person, MultipartFile file) throws IOException {
-        Image image;
-        if (file.getSize() != 0){
-            image = toImageEntity(file);
+        if (file != null && !file.isEmpty()) {
+            Image image = toImageEntity(file);
             person.addImageToPerson(image);
         }
         return personRepository.save(person);
     }
 
-        private Image toImageEntity(MultipartFile file) throws IOException {
-            Image image = new Image();
-            image.setName(file.getName());
-            image.setOriginalFileName(file.getOriginalFilename());
-            image.setContentType(file.getContentType());
-            image.setSize(file.getSize());
-            image.setBytes(file.getBytes());
-            return image;
-        }
+    private Image toImageEntity(MultipartFile file) throws IOException {
+        Image image = new Image();
+        image.setName(file.getName());
+        image.setOriginalFileName(file.getOriginalFilename());
+        image.setContentType(file.getContentType());
+        image.setSize(file.getSize());
+        image.setBytes(file.getBytes());
+        return image;
+    }
 
     public void delete(Long id) {
         personRepository.deleteById(id);
     }
 
-    public void update(Long id, String fullName, LocalDate birthDate) {
+    public void update(Long id, String fullName, LocalDate birthDate, MultipartFile photo,
+                       boolean shouldRemovePhoto, Long currentPhotoId) throws IOException {
         Optional<Person> optionalPerson = personRepository.findById(id);
         if (optionalPerson.isPresent()) {
             Person person = optionalPerson.get();
-            if (fullName != null) {
-                person.setFullName(fullName);
+
+            // 1. Обновляем базовые поля
+            person.setFullName(fullName);
+            person.setBirthDate(birthDate);
+
+            // 2. Удаляем старое фото, если нужно
+            if (shouldRemovePhoto && currentPhotoId != null) {
+                Image imageToRemove = imagesRepository.findById(currentPhotoId).orElse(null);
+                if (imageToRemove != null) {
+                    imagesRepository.delete(imageToRemove); // Удаляем из БД
+                    person.setImage(null); // Разрываем связь
+                }
             }
-            if (birthDate != null) {
-                person.setBirthDate(birthDate);
+
+            // 3. Добавляем новое фото, если файл загружен
+            if (photo != null && !photo.isEmpty()) {
+                // Удаляем старое фото (если есть)
+                if (person.getImage() != null) {
+                    imagesRepository.delete(person.getImage());
+                }
+                Image newImage = toImageEntity(photo);
+                person.addImageToPerson(newImage);
             }
+
             personRepository.save(person);
+        } else {
+            throw new RuntimeException("Пользователь не найден");
         }
     }
 

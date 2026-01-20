@@ -12,6 +12,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -30,8 +31,8 @@ public class PersonController {
     @GetMapping("/solarlab/api/menu/all")
     public String allPerson(Model model) {
         List<Person> people = personService.findAll();
-        model.addAttribute("people", people);
-        return "allPerson"; // Возвращаем имя HTML-шаблона для отображения всех пользователей
+        model.addAttribute("people", people != null ? people : Collections.emptyList());
+        return "allPerson";
     }
 
     @GetMapping("/solarlab/api/menu/create")
@@ -39,22 +40,43 @@ public class PersonController {
         return new ModelAndView("createPerson"); // Здесь "create" - название шаблона Thymeleaf
     }
 
-    @PostMapping(path = "solarlab/api/menu/create")
-    public String createPerson(@RequestParam String fullName, @RequestParam LocalDate birthDate, @RequestParam("file")MultipartFile file) throws IOException {
-        Person newPerson = new Person(null, fullName, birthDate);
-        personService.create(newPerson, file);
-        return "redirect:/solarlab/api/menu"; // Перенаправляем на страницу меню
+    @PostMapping("/solarlab/api/menu/create")
+    public String createPerson(
+            @RequestParam("fullName") String fullName,
+            @RequestParam LocalDate birthDate,
+            @RequestParam(value = "file", required = false) MultipartFile file,
+            Model model
+    ) {
+        Person person = new Person();
+        person.setFullName(fullName);
+        person.setBirthDate(birthDate);
+
+        try {
+            personService.create(person, file); // сохранение с изображением
+        } catch (IOException e) {
+            model.addAttribute("error", "Ошибка при загрузке файла: " + e.getMessage());
+            return "menu/create";
+        }
+        return "redirect:/solarlab/api/menu";
     }
 
-    @PostMapping(path = "/solarlab/api/menu/edit")
+
+    @PostMapping("/solarlab/api/menu/edit")
     @ResponseBody
     public Map<String, Object> editPerson(
             @RequestParam Long id,
             @RequestParam String fullName,
-            @RequestParam LocalDate birthDate
+            @RequestParam LocalDate birthDate,
+            @RequestParam(required = false) MultipartFile photo,
+            @RequestParam(value = "removePhoto", required = false) String removePhotoFlag,
+            @RequestParam(value = "currentPhotoId", required = false) Long currentPhotoId
     ) {
-        personService.update(id, fullName, birthDate);
-        return Map.of("status", "success", "message", "Данные пользователя изменены!");
+        try {
+            personService.update(id, fullName, birthDate, photo, "true".equals(removePhotoFlag), currentPhotoId);
+            return Map.of("status", "success", "message", "Данные сохранены!");
+        } catch (Exception e) {
+            return Map.of("status", "error", "message", e.getMessage());
+        }
     }
 
     @DeleteMapping(path = "solarlab/api/menu/delete/{id}")

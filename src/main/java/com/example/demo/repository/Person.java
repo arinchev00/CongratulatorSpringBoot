@@ -2,14 +2,14 @@ package com.example.demo.repository;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "person")
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Data
 public class Person {
 
     @Id
@@ -23,7 +23,7 @@ public class Person {
     private LocalDate birthDate;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "person")
-    private List<Image> images = new ArrayList<>();
+    private Image image;
 
     public Long getId() {
         return id;
@@ -79,7 +79,7 @@ public class Person {
 
     public void addImageToPerson (Image image) {
         image.setPerson(this);
-        images.add(image);
+        this.image = image;
     }
 }
 

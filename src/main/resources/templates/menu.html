@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-
+      xmlns:th="https://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
 <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
@@ -60,7 +59,12 @@
                     <td th:text="${person.fullName}"></td>
                     <td th:text="${person.birthdayStatus}"></td>
                     <td>
-                        <img th:src="@{'/images/' + ${person.images.get(0)}}"/>
+                        <div th:if="${person.image != null}">
+                            <img th:src="@{/images/{id}(id=${person.image.id})}"
+                                 alt="Фото"
+                                 style="max-width: 100px; max-height: 100px;" />
+                        </div>
+                        <div th:if="${person.image == null}">Нет фото</div>
                     </td>
                 </tr>
                 </tbody>
