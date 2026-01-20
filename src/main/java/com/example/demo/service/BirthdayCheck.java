@@ -41,7 +41,7 @@ public class BirthdayCheck {
                 case 2: status = "Послезавтра"; break;
                 case -1: status = "Вчера"; break;
                 case -2: status = "Позавчера"; break;
-                default: continue; // Пропускаем остальные случаи
+                default: continue;
             }
             user.setBirthdayStatus(status);
             filteredUsers.add(user);
@@ -67,7 +67,7 @@ public class BirthdayCheck {
                         return i;
                     }
                 }
-                return Integer.MAX_VALUE; // Если статус не найден
+                return Integer.MAX_VALUE;
             }
         });
 

@@ -18,9 +18,9 @@ import java.util.Optional;
 public class PersonService {
 
     private final PersonRepository personRepository;
-    private final ImagesRepository imagesRepository; // Добавляем поле
+    private final ImagesRepository imagesRepository;
 
-    // Конструктор с внедрением зависимостей
+
     public PersonService(PersonRepository personRepository, ImagesRepository imagesRepository) {
         this.personRepository = personRepository;
         this.imagesRepository = imagesRepository;
@@ -60,11 +60,9 @@ public class PersonService {
         if (optionalPerson.isPresent()) {
             Person person = optionalPerson.get();
 
-            // 1. Обновляем базовые поля
             person.setFullName(fullName);
             person.setBirthDate(birthDate);
 
-            // 2. Удаляем старое фото, если нужно
             if (shouldRemovePhoto && currentPhotoId != null) {
                 Image imageToRemove = imagesRepository.findById(currentPhotoId).orElse(null);
                 if (imageToRemove != null) {
@@ -76,9 +74,8 @@ public class PersonService {
                 }
             }
 
-            // 3. Добавляем новое фото, если файл загружен
             if (photo != null && !photo.isEmpty()) {
-                // Удаляем старое фото (если есть)
+
                 if (person.getImage() != null) {
                     imagesRepository.delete(person.getImage());
                     person.setImage(null); // Явно разрываем связь
