@@ -68,8 +68,11 @@ public class PersonService {
             if (shouldRemovePhoto && currentPhotoId != null) {
                 Image imageToRemove = imagesRepository.findById(currentPhotoId).orElse(null);
                 if (imageToRemove != null) {
-                    imagesRepository.delete(imageToRemove); // Удаляем из БД
-                    person.setImage(null); // Разрываем связь
+                    // Разрываем связь до удаления из БД
+                    person.setImage(null);
+                    imagesRepository.delete(imageToRemove);
+                    personRepository.flush(); // Принудительная синхронизация
+                    System.out.println("Фото удалено из БД, связь разорвана");
                 }
             }
 
@@ -78,16 +81,20 @@ public class PersonService {
                 // Удаляем старое фото (если есть)
                 if (person.getImage() != null) {
                     imagesRepository.delete(person.getImage());
+                    person.setImage(null); // Явно разрываем связь
+                    personRepository.flush();
                 }
                 Image newImage = toImageEntity(photo);
                 person.addImageToPerson(newImage);
             }
 
             personRepository.save(person);
+            System.out.println("Изменения сохранены для пользователя: " + person.getId());
         } else {
             throw new RuntimeException("Пользователь не найден");
         }
     }
+
 
     public Optional<Person> findById(Long id) {
         return personRepository.findById(id);

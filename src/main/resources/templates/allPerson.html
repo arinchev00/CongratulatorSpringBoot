@@ -147,30 +147,33 @@
     }
 
     document.getElementById('editForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-        const formData = new FormData(this);
+    event.preventDefault();
+    const formData = new FormData(this);
 
-        if (photoToRemove) {
-            formData.append('removePhoto', 'true'); // Добавляем флаг удаления
+    if (photoToRemove) {
+        formData.append('removePhoto', 'true');
+        console.log('Флаг удаления передан: removePhoto=true');
+    } else {
+        console.log('Флаг удаления не установлен');
+    }
+
+    fetch('/solarlab/api/menu/edit', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (response.ok) {
+            alert('Изменения сохранены!');
+            location.reload();
+        } else {
+            alert('Ошибка при сохранении.');
         }
-
-        fetch('/solarlab/api/menu/edit', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => {
-            if (response.ok) {
-                alert('Изменения сохранены!');
-                location.reload();
-            } else {
-                alert('Ошибка при сохранении.');
-            }
-        })
-        .catch(error => {
-            console.error('Ошибка:', error);
-            alert('Ошибка сети.');
-        });
+    })
+    .catch(error => {
+        console.error('Ошибка:', error);
+        alert('Ошибка сети.');
     });
+});
 </script>
 </body>
 </html>

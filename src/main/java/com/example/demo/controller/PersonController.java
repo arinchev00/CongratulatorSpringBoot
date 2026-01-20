@@ -72,7 +72,10 @@ public class PersonController {
             @RequestParam(value = "currentPhotoId", required = false) Long currentPhotoId
     ) {
         try {
-            personService.update(id, fullName, birthDate, photo, "true".equals(removePhotoFlag), currentPhotoId);
+            boolean shouldRemovePhoto = "true".equals(removePhotoFlag);
+            System.out.println("Параметры обновления: id=" + id + ", removePhoto=" + shouldRemovePhoto + ", currentPhotoId=" + currentPhotoId);
+
+            personService.update(id, fullName, birthDate, photo, shouldRemovePhoto, currentPhotoId);
             return Map.of("status", "success", "message", "Данные сохранены!");
         } catch (Exception e) {
             return Map.of("status", "error", "message", e.getMessage());
