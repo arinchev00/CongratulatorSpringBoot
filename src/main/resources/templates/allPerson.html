@@ -60,7 +60,7 @@
         <!-- Форма редактирования -->
         <div id="editFormContainer">
             <h4>Редактирование пользователя</h4>
-            <form id="editForm" th:action="@{/solarlab/api/menu/edit}" method="post">
+            <form id="editForm" th:action="@{/api/menu/edit}" method="post">
                 <input type="hidden" id="editId" name="id"/>
                 <input type="hidden" id="currentPhotoId" name="currentPhotoId"/>
 
@@ -90,7 +90,7 @@
 </div>
 
 <div class="button-container">
-    <a href="/solarlab/api/menu" class="btn btn-primary">Вернуться в меню</a>
+    <a href="/api/menu" class="btn btn-primary">Вернуться в меню</a>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
@@ -140,6 +140,10 @@
         document.getElementById('editFormContainer').style.display = 'block';
     }
 
+    function hideEditForm() {
+    document.getElementById('editFormContainer').style.display = 'none';
+}
+
     function removeCurrentPhoto() {
         const currentPhotoDiv = document.getElementById('currentPhoto');
         currentPhotoDiv.style.display = 'none';
@@ -158,7 +162,7 @@
             console.log('Флаг удаления не установлен');
         }
 
-        fetch('/solarlab/api/menu/edit', {
+        fetch('/api/menu/edit', {
             method: 'POST',
             body: formData
         })
@@ -191,7 +195,7 @@
             return;
         }
 
-        fetch(`/solarlab/api/menu/delete/${personId}`, {
+        fetch(`/api/menu/delete/${personId}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json'

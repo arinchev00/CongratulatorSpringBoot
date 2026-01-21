@@ -26,19 +26,19 @@ public class PersonController {
         this.personService = personService;
     }
 
-    @GetMapping("/solarlab/api/menu/all")
+    @GetMapping("/api/menu/all")
     public String allPerson(Model model) {
         List<Person> people = personService.findAll();
         model.addAttribute("people", people != null ? people : Collections.emptyList());
         return "allPerson";
     }
 
-    @GetMapping("/solarlab/api/menu/create")
+    @GetMapping("/api/menu/create")
     public ModelAndView createPage() {
         return new ModelAndView("createPerson"); // Здесь "create" - название шаблона Thymeleaf
     }
 
-    @PostMapping("/solarlab/api/menu/create")
+    @PostMapping("/api/menu/create")
     public String createPerson(
             @RequestParam("fullName") String fullName,
             @RequestParam LocalDate birthDate,
@@ -55,11 +55,11 @@ public class PersonController {
             model.addAttribute("error", "Ошибка при загрузке файла: " + e.getMessage());
             return "menu/create";
         }
-        return "redirect:/solarlab/api/menu";
+        return "redirect:/api/menu";
     }
 
 
-    @PostMapping("/solarlab/api/menu/edit")
+    @PostMapping("/api/menu/edit")
     @ResponseBody
     public Map<String, Object> editPerson(
             @RequestParam Long id,
@@ -80,7 +80,7 @@ public class PersonController {
         }
     }
 
-    @DeleteMapping(path = "solarlab/api/menu/delete/{id}")
+    @DeleteMapping(path = "/api/menu/delete/{id}")
     @ResponseBody
     public Map<String, String> deletePerson(@PathVariable Long id) {
             personService.delete(id);
